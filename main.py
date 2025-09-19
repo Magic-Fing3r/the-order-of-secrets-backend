@@ -5,7 +5,7 @@ import openai
 import os
 
 # Load API key from environment
-openai.api_key = os.getenv("OPENAI_API_KEY")
+openai.api_key = os.getenv("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")
 
 app = FastAPI(title="Order of Secrets API")
 
