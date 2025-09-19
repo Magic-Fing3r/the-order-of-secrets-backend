@@ -1,11 +1,11 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-import openai
+from openai import OpenAI
 import os
 
-# Load API key from environment
-openai.api_key = os.getenv("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")
+# Initialize OpenAI client
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 app = FastAPI(title="Order of Secrets API")
 
@@ -25,15 +25,15 @@ class ChatRequest(BaseModel):
 @app.post("/v1/chat")
 async def chat_endpoint(req: ChatRequest):
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": "You are the voice of the Order of Secrets. Speak in cryptic, wise tones."},
-                {"role": "user", "content": req.message}
+                {"role": "user", "content": req.message},
             ],
             max_tokens=250,
         )
-        reply = response.choices[0].message["content"]
+        reply = response.choices[0].message.content
         return {"reply": reply}
     except Exception as e:
         return {"error": str(e)}
