@@ -27,11 +27,11 @@ def is_simple_question(text: str) -> bool:
     """Detect trivial/common knowledge or simple math questions."""
     text = text.lower().strip()
 
-    # Simple math
+    # Simple math like "2+2", "10-3"
     if re.match(r"^\d+\s*[\+\-\*\/]\s*\d+$", text):
         return True
 
-    # Common knowledge phrases
+    # Common knowledge/trivial phrases
     trivial_keywords = [
         "2+2", "one plus one", "what is 1+1", "basic math", "multiply", "divide",
         "color of the sky", "sun rises", "earth is round", "water is wet",
@@ -57,7 +57,8 @@ async def chat_endpoint(req: ChatRequest):
                 "You test the patience of the ancient ones... ",
                 "This again? Very well, hear the obvious: ",
                 "Even the youngest Initiate knows this... ",
-                "Do you seek riddles or nursery tales, Seeker? "
+                "Do you seek riddles or nursery tales, Seeker? ",
+                "Really? That’s the mystery you bring before the Order? Fine… "
             ]
             chosen_intro = random.choice(sarcastic_intros)
 
@@ -67,9 +68,9 @@ async def chat_endpoint(req: ChatRequest):
                     {
                         "role": "system",
                         "content": """You are the Order of Secrets.
-For trivial or obvious questions, respond with sarcasm or playful wit,
-then provide the direct answer. Example:
-'Ah, Seeker... you truly ask what 2+2 is? It is 4, and it has always been 4.'"""
+When asked trivial or obvious questions, respond with sarcasm or playful wit first,
+then give the direct answer clearly.
+Example: 'Really? That’s the mystery you bring before the Order? Fine… it’s 4. It has always been 4.'"""
                     },
                     {"role": "user", "content": req.message},
                 ],
@@ -78,7 +79,7 @@ then provide the direct answer. Example:
             reply = chosen_intro + response.choices[0].message.content
             return {"reply": reply}
 
-        # 🌌 Mystic mode for deeper questions
+        # 🌌 Mystic mode for deeper/serious questions
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
